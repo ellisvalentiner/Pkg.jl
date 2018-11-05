@@ -22,6 +22,7 @@ function git_init_package(tmp, path)
     return pkgpath
 end
 
+#=
 @testset "generate args" begin
     @test_throws PkgError pkg"generate"
 end
@@ -87,8 +88,10 @@ end
     @test statement.arguments[1] == "git@gitlab-fsl.jsc.näsan.guvv:drats/URGA2010.jl.git"
     @test statement.arguments[2] == "@0.5.0"
 end
+=#
 
 temp_pkg_dir() do project_path; cd(project_path) do; mktempdir() do tmp_pkg_path
+    #=
     pkg"activate ."
     pkg"add Example@0.5"
     @test isinstalled(TEST_PKG)
@@ -113,20 +116,22 @@ temp_pkg_dir() do project_path; cd(project_path) do; mktempdir() do tmp_pkg_path
     @eval import $(Symbol(pkg))
     @test Pkg.API.__installed()[pkg] == v"0.0"
     Pkg.test("UnregisteredWithoutProject")
+    =#
 
     pkg2 = "UnregisteredWithProject"
     p2 = git_init_package(tmp_pkg_path, joinpath(@__DIR__, "test_packages/$pkg2"))
-    Pkg.REPLMode.pkgstr("add $p2")
-    Pkg.REPLMode.pkgstr("pin $pkg2")
+    #Pkg.REPLMode.pkgstr("add $p2")
+    #Pkg.REPLMode.pkgstr("pin $pkg2")
     # FIXME: this confuses the precompile logic to know what is going on with the user
     # FIXME: why isn't this testing the Pkg after importing, rather than after freeing it
     #@eval import Example
     #@eval import $(Symbol(pkg2))
-    @test Pkg.API.__installed()[pkg2] == v"0.1.0"
-    Pkg.REPLMode.pkgstr("free $pkg2")
-    @test_throws PkgError Pkg.REPLMode.pkgstr("free $pkg2")
-    Pkg.test("UnregisteredWithProject")
+    #@test Pkg.API.__installed()[pkg2] == v"0.1.0"
+    #Pkg.REPLMode.pkgstr("free $pkg2")
+    #@test_throws PkgError Pkg.REPLMode.pkgstr("free $pkg2")
+    #Pkg.test("UnregisteredWithProject")
 
+    #=
     write(joinpath(p2, "Project.toml"), """
         name = "UnregisteredWithProject"
         uuid = "58262bb0-2073-11e8-3727-4fe182c12249"
@@ -171,11 +176,12 @@ temp_pkg_dir() do project_path; cd(project_path) do; mktempdir() do tmp_pkg_path
         end # cd_tempdir
     end # withenv
     end # mktempdir
+    =#
 end # mktempdir
 end # cd
 end # temp_pkg_dir
 
-
+#=
 temp_pkg_dir() do project_path; cd(project_path) do
     mktempdir() do tmp
         mktempdir() do depot_dir
@@ -970,5 +976,6 @@ end
         @test_throws PkgError pkg"test Example@v0.0.1"
     end end end
 end
+=#
 
 end # module
